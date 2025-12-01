@@ -5,34 +5,31 @@ import traceback
 from datetime import datetime
 from functools import wraps
 
-from pyrogram import Client, StopPropagation
+from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.types import (
-    BotCommand,
-    BotCommandScopeAllChatAdministrators,
-    BotCommandScopeAllGroupChats,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeChat,
-    BotCommandScopeChatMember,
-)
+from pyrogram.handlers import MessageHandler
+
+from pyrogram.errors import RPCError
+from pyrogram.errors.exceptions.forbidden_403 import Forbidden
+from pyrogram.errors.exceptions.flood_420 import FloodWait
+from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid, MessageNotModified
 
 import config
-from ..logging import LOGGER
+from MusicIndo.logging import LOGGER
 
-# ✅ IMPORT USERBOT CLASS BIAR TIDAK UNDEFINED
+# ✅ IMPORT USERBOT SUDAH FIXED
 from MusicIndo.core.userbot import Userbot
 
 class YukkiBot(Client):
-    def __init__(self, *args, **kwargs):
-        LOGGER(__name__).info("Starting Bot...")
+    def __init__(self):
+        LOGGER(__name__).info("STARTING BOT...")
 
         super().__init__(
-            "MusicIndo",
+            name="MusicIndo",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             bot_token=config.BOT_TOKEN,
             sleep_threshold=240,
-            max_concurrent_transmissions=5,
             workers=50,
         )
         self.loaded_plug_counts = 0
@@ -43,13 +40,14 @@ class YukkiBot(Client):
             async def wrapper(client, message):
                 try:
                     await func(client, message)
-                except Exception as e:
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
+                except (RPCError, Forbidden, FloodWait, MessageIdInvalid, MessageNotModified):
+                    pass
+                except Exception:
                     LOGGER(__name__).error(traceback.format_exc())
-
-            handler = MessageHandler(wrapper, filters)
-            self.add_handler(handler, group)
+            self.add_handler(MessageHandler(wrapper, filters), group)
             return func
-
         return decorator
 
     async def start(self):
@@ -60,27 +58,13 @@ class YukkiBot(Client):
         self.name = me.full_name
         self.mention = me.mention
 
-        LOGGER(__name__).info(f"MusicBot started as {self.name}")
+        LOGGER(__name__).info(f"BOT STARTED AS {self.name}")
+        try:
+            await self.send_message(config.LOG_GROUP_ID, f"{self.mention} BOT STARTED")
+        except Exception:
+            pass
 
-    async def run_shell_command(self, command: list):
-        process = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        stdout, stderr = await process.communicate()
-
-        return {
-            "returncode": process.returncode,
-            "stdout": stdout.decode().strip() if stdout else None,
-            "stderr": stderr.decode().strip() if stderr else None,
-        }
-
-# ====== INITIALIZER BOT INSTANCE ======
+# ✅ INITIALIZER INSTANCE
 app = YukkiBot()
-
-# ✅ SEKARANG USERBOT PUNYA IMPORT, TIDAK NAMEERROR LAGI
 userbot = Userbot()
-
 HELPABLE = {}
