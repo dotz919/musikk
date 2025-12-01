@@ -1,14 +1,23 @@
 import asyncio
-import importlib.util
 import os
+import sys
 import traceback
 from datetime import datetime
 from functools import wraps
 
-from pyrogram import Client
+from pyrogram import Client, idle, StopPropagation
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.handlers import MessageHandler
+from pyrogram.types import (
+    BotCommand,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeChat,
+    BotCommandScopeChatMember,
+)
 
+# ✅ HANYA IMPORT ERROR CLASS YANG BENAR DI VERSI TERBARU
 from pyrogram.errors import RPCError
 from pyrogram.errors.exceptions.forbidden_403 import Forbidden
 from pyrogram.errors.exceptions.flood_420 import FloodWait
@@ -17,22 +26,19 @@ from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid, Message
 import config
 from MusicIndo.logging import LOGGER
 
-# ✅ IMPORT USERBOT SUDAH FIXED
-from MusicIndo.core.userbot import Userbot
 
-class YukkiBot(Client):
+class Userbot(Client):
     def __init__(self):
-        LOGGER(__name__).info("STARTING BOT...")
+        LOGGER(__name__).info("STARTING USERBOT...")
 
         super().__init__(
-            name="MusicIndo",
+            name="UserBotMusicIndo",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
-            bot_token=config.BOT_TOKEN,
+            bot_token=None,
             sleep_threshold=240,
             workers=50,
         )
-        self.loaded_plug_counts = 0
 
     def on_message(self, filters=None, group=0):
         def decorator(func):
@@ -40,14 +46,30 @@ class YukkiBot(Client):
             async def wrapper(client, message):
                 try:
                     await func(client, message)
+
+                # ✅ HANDLE FLOOD WAIT YANG BENAR
                 except FloodWait as e:
+                    LOGGER(__name__).warning(f"FLOOD WAIT {e.value}s, SLEEPING...")
                     await asyncio.sleep(e.value)
-                except (RPCError, Forbidden, FloodWait, MessageIdInvalid, MessageNotModified):
+
+                # ✅ EXCEPT KOMPATIBEL, TIDAK ADA ERROR LAMA
+                except (RPCError, Forbidden, BadRequest, MessageIdInvalid, MessageNotModified):
                     pass
-                except Exception:
-                    LOGGER(__name__).error(traceback.format_exc())
+
+                except StopPropagation:
+                    raise
+
+                except Exception as e:
+                    err = traceback.format_exc()
+                    LOGGER(__name__).error(err)
+                    try:
+                        await self.send_message(config.LOG_GROUP_ID, f"USERBOT ERROR:\n{err}")
+                    except:
+                        pass
+
             self.add_handler(MessageHandler(wrapper, filters), group)
             return func
+
         return decorator
 
     async def start(self):
@@ -57,14 +79,8 @@ class YukkiBot(Client):
         self.id = me.id
         self.name = me.full_name
         self.mention = me.mention
+        LOGGER(__name__).info(f"USERBOT STARTED AS {self.name}")
 
-        LOGGER(__name__).info(f"BOT STARTED AS {self.name}")
-        try:
-            await self.send_message(config.LOG_GROUP_ID, f"{self.mention} BOT STARTED")
-        except Exception:
-            pass
-
-# ✅ INITIALIZER INSTANCE
-app = YukkiBot()
-userbot = Userbot()
-HELPABLE = {}
+    async def stop(self):
+        await super().stop()
+        LOGGER(__name__).info("USERBOT STOPPED")
