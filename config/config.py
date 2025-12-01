@@ -28,17 +28,17 @@ def getenv(key, default=None):
 
 # Get it from my.telegram.org
 
-API_ID = int(getenv("API_ID", ""))
+API_ID = int(getenv("API_ID", "20364494"))
 
-API_HASH = getenv("API_HASH")
+API_HASH = getenv("96a698baae5ff0d63ed642071eddbdae")
 
 
 # Get it from @Botfather in Telegram.
-BOT_TOKEN = getenv("BOT_TOKEN")
+BOT_TOKEN = getenv("8390067122:AAE1fTIlTZJMBQjzkAi0ehfEajSIHzdhW_Q")
 
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
-MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+MONGO_DB_URI = getenv("mongodb+srv://dots123:dots123@cluster0.y7bjbmr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", None)
 
 # Your cookies pasted link on batbin.me
 # you can skip if you are adding cookies
@@ -77,11 +77,11 @@ SONG_DOWNLOAD_DURATION = int(
 
 
 # You'll need a Group ID or USERNAME for this.
-LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()
+LOG_GROUP_ID = getenv("LOG_GROUP_ID", "1003441832323").strip()
 
 # Your User ID.
 OWNER_ID = list(
-    map(int, getenv("OWNER_ID", "6815918609").split())
+    map(int, getenv("OWNER_ID", "6739598575").split())
 )  # Input type must be interger
 
 # Get it from http://dashboard.heroku.com/account
@@ -107,11 +107,11 @@ GIT_TOKEN = getenv(
 
 # Only  Links formats are  accepted for this Var value.
 SUPPORT_CHANNEL = getenv(
-    "SUPPORT_CHANNEL", "https://t.me/TheTeamVivek"
-)  # Example:- https://t.me/TheTeamVivek
+    "SUPPORT_CHANNEL", "https://t.me/dotzstorereall"
+)  # Example:- https://t.me/dotzstorereall
 SUPPORT_GROUP = getenv(
-    "SUPPORT_GROUP", "https://t.me/TheTeamVk"
-)  # Example:- https://t.me/TheTeamVk
+    "SUPPORT_GROUP", "https://t.me/dotzsupoorrt"
+)  # Example:- https://t.me/dotzsupoorrt
 
 
 # Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
@@ -176,7 +176,7 @@ SET_CMDS = is_bool(getenv("SET_CMDS", "False"))
 
 # You'll need a Pyrogram String Session for these vars. See config/README.md for more information.
 # Get the environment variable with a default value of an empty
-STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
+STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", "BQE2vM4AI32Utk4k8YfYtlKZI2bAn3qbDLdyozUnSn0b_V73B7gZurjmQR6djkzVSqudyG0d8bRLicY3O8_ZgwO7BqxIMv5h44bPmuODR3Djkxacya4U5C0qKp3LJgTaRutwA2qozgLxc1mFkYTWrBTXCQVwdpbisc-DFUdJ6F0e2Nx785wkk0ZxSfy_wR5V1ZCtfQTny0wcJI6h1DlMVBplvIIhbXSIEAcsZ1YoEycKJGQCUxacxgnci3fngK9exXPbREZGyy-RL8KVcxRDxhoPYzP3s39jlyp61oV3HchYo3Z5dHMVtXAQezZGr4WQPa1W68ueJ9MbuwBJ09w_yvf3hRG-8gAAAAHO_CXMAA"))
 
 #  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
 #  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
